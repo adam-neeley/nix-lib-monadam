@@ -17,6 +17,7 @@
           mapAttrs (file: type:
             if (type == "directory") then readDirRec "${dir}/${file}" else type)
           (builtins.readDir dir);
+      lib = pkgs.lib.extend (final: prev: rec {
         getFirstChar = str: strings.head (strings.stringToCharacters str);
         getDirs = dir:
           filter (el: el != null) (pkgs.lib.attrsets.mapAttrsToList (file: type:
@@ -31,6 +32,6 @@
         packageFiles = dir:
           map (file: ./. + "/${file}")
           (filter (file: (baseNameOf file) == "package.nix") (files dir));
-      };
+      });
     };
 }
