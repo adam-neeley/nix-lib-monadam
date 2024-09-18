@@ -12,12 +12,19 @@
         mapAttrsToList filterAttrs hasPrefix hasSuffix nameValuePair
         removeSuffix;
     in {
-      lib = rec {
-        readDirRec = dir:
-          mapAttrs (file: type:
-            if (type == "directory") then readDirRec "${dir}/${file}" else type)
-          (builtins.readDir dir);
+      checks = { };
       lib = pkgs.lib.extend (final: prev: rec {
+        flakes = {
+          forEachSystem = (systems: f:
+            nixpkgs.lib.genAttrs systems (system:
+              f {
+                pkgs = import nixpkgs {
+                  inherit system;
+                  config.allowUnfree = true;
+                };
+              }));
+        };
+        strings.join = char: list: concatStringsSep char list;
         getFirstChar = str: strings.head (strings.stringToCharacters str);
         getDirs = dir:
           filter (el: el != null) (pkgs.lib.attrsets.mapAttrsToList (file: type:
@@ -25,6 +32,10 @@
               file
             else
               null) (builtins.readDir dir));
+        readDirRec = dir:
+          mapAttrs (file: type:
+            if (type == "directory") then readDirRec "${dir}/${file}" else type)
+          (builtins.readDir dir);
         files = dir:
           collect isString
           (mapAttrsRecursive (path: type: concatStringsSep "/" path)
