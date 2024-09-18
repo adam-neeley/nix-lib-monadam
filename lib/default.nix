@@ -1,4 +1,4 @@
-{ lib, ... }:
+{ lib }:
 
 let
   inherit (builtins) attrValues readDir pathExists concatLists concatStringsSep;
