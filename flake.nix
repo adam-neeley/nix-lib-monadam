@@ -3,7 +3,8 @@
 
   outputs = { self, nixpkgs }:
     let
-      pkgs = import nixpkgs { };
+      system = "x86_64-linux";
+      pkgs = import nixpkgs { inherit system; };
       inherit (builtins)
         attrValues readDir pathExists concatLists concatStringsSep;
       inherit (pkgs.lib)
